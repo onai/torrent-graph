@@ -1,0 +1,94 @@
+diff --git a/workers/crawl.js b/workers/crawl.js
+index 27826a0..c4ec263 100644
+--- a/workers/crawl.js
++++ b/workers/crawl.js
+@@ -2,6 +2,7 @@ var bencode = require('bencode'),
+     dgram = require('dgram'),
+     hat = require('hat'),
+     _ = require('lodash');
++const util = require('util')
+ 
+ // Put in a function. The returned function won't ever throw an error. This is
+ // quite useful for malformed messages.
+@@ -31,6 +32,11 @@ var idToBuffer = makeSafe(function (id) {
+   return new Buffer(id, 'hex');
+ });
+ 
++var bufferToId = makeSafe(function (hexid) {
++  const buf = Buffer.from(hexid, 'utf8');
++  return buf.toString('hex');
++});
++
+ var decode = makeSafe(bencode.decode, {}),
+     encode = makeSafe(bencode.encode, {});
+ 
+@@ -69,29 +75,58 @@ socket.on('message', function (msg, rinfo) {
+     BOOTSTRAP_NODES.shift();
+   }
+ 
+-  // console.log('Received message from ' + rinfo.address);
++  //console.log('Received message from ' + rinfo.address);
+   msg = decode(msg);
++  //console.log(msg)
+   var transactionId = Buffer.isBuffer(msg.t) && msg.t.length === 2 && msg.t.readUInt16BE(0);
+   var infoHash = transactions[transactionId];
+   if (transactionId === false || infoHash === undefined || jobs[infoHash] === undefined) {
+     return;
+   }
+   delete transactions[transactionId];
++
++  lengthOfQueue = jobs[infoHash].queue.length
++  lastItemInQueue = jobs[infoHash].queue[lengthOfQueue-1]
++  nodeK = Object.keys(jobs[infoHash].nodes)
++  peerK = Object.keys(jobs[infoHash].peers)
++  //
++  // if queue[-1] is a node:
+   if (msg.r && msg.r.values) {
++    //console.log('Queried peer ' + bufferToId(msg.r.id) +' has these peers for the infohash')
+     _.each(msg.r.values, function (peer) {
+       peer = compact2string(peer);
+       if (peer && !jobs[infoHash].peers[peer]) {
+-        console.log('Found new peer ' + peer + ' for ' + infoHash);
++        //console.log('Found new peer ' + peer + ' for ' + infoHash);
++        nodekeys = jobs[infoHash]
++
++        if (nodeK.includes(lastItemInQueue)) {
++          console.log("node to peer: " + lastItemInQueue + " -> " + peer)
++        }
++        else if (peerK.includes(lastItemInQueue)) {
++          // don't think this will happen here
++          console.log("peer to peer: " + lastItemInQueue + " -> " + peer)
++        }
++
+         jobs[infoHash].peers[peer] = true;
+         jobs[infoHash].queue.push(peer);
+       }
+     });
+   }
+   if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
++    //console.log('Queried peer ' + bufferToId(msg.r.id) +' doesn\'t have peers but it has some leads')
+     for (var i = 0; i < msg.r.nodes.length; i += 26) {
+       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
+       if (node && !jobs[infoHash].peers[node]) {
+-        console.log('Found new node ' + node + ' for ' + infoHash);
++        //console.log('Found new node ' + node + ' for ' + infoHash);
++        //console.log('Dumping jobs');
++        ///console.log(util.inspect(jobs, {showHidden: false, depth: null}))
++        if (nodeK.includes(lastItemInQueue)) {
++          console.log("node to node: " + lastItemInQueue + " -> " + node)
++        }
++        else if (peerK.includes(lastItemInQueue)) {
++          // don't think this will happen here
++          console.log("peer to node: " + lastItemInQueue + " -> " + node)
++        }
+         jobs[infoHash].nodes[node] = true;
+         jobs[infoHash].queue.push(node);
+       }
+@@ -125,6 +160,7 @@ var getPeers = function (infoHash, addr) {
+       info_hash: idToBuffer(infoHash)
+     }
+   });
++  //console.log('Sending request to IP address' + ip + ":" + port)
+   socket.send(message, 0, message.length, port, ip);
+ };
+ 
