@@ -1,4 +1,3 @@
-Graph analysis of torrents
 Graph analysis on real torrent network, with sample results for data from the movie Sintel.
 
 # Table Of Contents
