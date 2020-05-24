@@ -39,14 +39,15 @@ magnet:?xt=urn:btih:08ada5a7a6183aae1e09d831df6748d566095a10&dn=Sintel&tr=udp%3A
 11. To visualize, run `python plot.py`
 
 # References
-[1]: http://www.bittorrent.org/beps/bep_0005.html
 
-[2]: Peter Maymounkov, David Mazieres, "Kademlia: A Peer-to-peer Information System Based on the XOR Metric", IPTPS 2002. http://www.cs.rice.edu/Conferences/IPTPS02/109.pdf
+[1] http://www.bittorrent.org/beps/bep_0005.html
 
-[3]: http://mg8.org/processing/bt.html
+[2] Peter Maymounkov, David Mazieres, "Kademlia: A Peer-to-peer Information System Based on the XOR Metric", IPTPS 2002. http://www.cs.rice.edu/Conferences/IPTPS02/109.pdf
 
-[4]: Secure Hash Standard - SHS: Federal Information Processing Standards Publication 180-4. NIST, U.S. Department of Commerce. 2012. 
+[3] http://mg8.org/processing/bt.html
 
-[5]: Creative Commons Attribution 3.0 license
+[4] Secure Hash Standard - SHS: Federal Information Processing Standards Publication 180-4. NIST, U.S. Department of Commerce. 2012. 
 
-[6]: https://www.imdb.com/title/tt1727587/
+[5] Creative Commons Attribution 3.0 license
+
+[6] https://www.imdb.com/title/tt1727587/
