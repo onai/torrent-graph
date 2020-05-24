@@ -1,7 +1,7 @@
 Graph analysis of torrents
 Graph analysis on real torrent network, with sample results for data from the movie Sintel.
 
-Table Of Contents
+# Table Of Contents
 1. [Background](#Background)
 2. [Sample results](#sample-results)
 3. [How To Run](#how-to-run)
